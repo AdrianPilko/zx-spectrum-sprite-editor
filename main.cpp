@@ -32,6 +32,8 @@
                                             
 int32_t parseInput(const std::string & inFileName, const std::string & outFileName)
 {
+    const int32_t c_NumberOfCharBlocks{9};
+
     std::fstream iStream(inFileName, std::ios::in);
     std::fstream oStream(outFileName, std::ios::out);
 
@@ -73,16 +75,12 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
 
     std::ostringstream buffer;
     std::vector<std::ostringstream> outputSS;
-    outputSS.resize(9);
-    outputSS[0].str("");
-    outputSS[1].str("");
-    outputSS[2].str("");
-    outputSS[3].str("");
-    outputSS[4].str("");
-    outputSS[5].str("");
-    outputSS[6].str("");
-    outputSS[7].str("");
-    outputSS[8].str("");
+    outputSS.resize(c_NumberOfCharBlocks);
+    for (size_t i = 0; i < c_NumberOfCharBlocks; i++)
+    {
+        outputSS[i].str("");
+    }
+
     int32_t third = 0;
 
     for (auto rowOuter = 0; rowOuter < fileAsStrVec.size(); rowOuter++)
@@ -92,7 +90,6 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
             twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
             std::cout << twoDimGrid[rowOuter][columnOuter] << " " ;
             
-            //if (twoDimGrid[rowOuter][columnOuter] == '1')
             if (twoDimGrid[rowOuter][columnOuter] == '1')
             {
                 buffer << "1";
@@ -158,15 +155,19 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
                 }
             }
         }
-        std::cout << std::endl;
     }
+    // 0 1 2 
+    // 3 4 5
+    // 6 7 8
   
     oStream << outputSS[0].str() << std::endl;
     oStream << outputSS[1].str() << std::endl;
     oStream << outputSS[2].str() << std::endl;
+
     oStream << outputSS[3].str() << std::endl;
     oStream << outputSS[4].str() << std::endl;
     oStream << outputSS[5].str() << std::endl;
+
     oStream << outputSS[6].str() << std::endl;
     oStream << outputSS[7].str() << std::endl;     
     oStream << outputSS[8].str() << std::endl;     
