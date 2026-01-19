@@ -103,58 +103,68 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
             {
                 if (columnOuter == 7)
                 {
+                    std::cout << "0 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[0] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 15)
                 {
+                    std::cout << "1 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[1] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 23)
                 {
+                    std::cout << "2 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[2] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
-                    third++;
                 }
             } else if (third == 1)
             {
                 if (columnOuter == 7)
                 {
+                    std::cout << "3 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[3] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 15)
                 {
+                    std::cout << "4 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[4] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 23)
                 {
+                    std::cout << "5 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[5] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
-                    third++;
                 }
             } else if (third == 2)
             {   
                 if (columnOuter == 7)
                 {
+                    std::cout << "6 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[6] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 15)
                 {
+                    std::cout << "7 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[7] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 23)
                 {
+                    std::cout << "8 t="<<third << " r="<< rowOuter << " c=" << columnOuter << std::endl;
                     outputSS[8] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
-                    third = 0;
                 }
             }
         }
+        if (rowOuter == 7) third++;
+        if (rowOuter == 15) third++;
+        if (rowOuter == 23) third++;
+        std::cout << std::endl;
     }
     // 0 1 2 
     // 3 4 5
