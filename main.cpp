@@ -103,19 +103,16 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
             {
                 if (columnOuter == 7)
                 {
-                    std::cout << "0 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[0] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 15)
                 {
-                    std::cout << "1 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[1] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 23)
                 {
-                    std::cout << "2 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[2] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
@@ -123,19 +120,16 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
             {
                 if (columnOuter == 7)
                 {
-                    std::cout << "3 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[3] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 15)
                 {
-                    std::cout << "4 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[4] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 23)
                 {
-                    std::cout << "5 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[5] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
@@ -143,19 +137,16 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
             {   
                 if (columnOuter == 7)
                 {
-                    std::cout << "6 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[6] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 15)
                 {
-                    std::cout << "7 t="<<third << " r="<< rowOuter << " c=" << columnOuter<< std::endl;
                     outputSS[7] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
                 if (columnOuter == 23)
                 {
-                    std::cout << "8 t="<<third << " r="<< rowOuter << " c=" << columnOuter << std::endl;
                     outputSS[8] << "defb %" << buffer.str() << std::endl;
                     buffer.str("");
                 }
@@ -170,18 +161,10 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
     // 3 4 5
     // 6 7 8
   
-    oStream << outputSS[0].str() << std::endl;
-    oStream << outputSS[1].str() << std::endl;
-    oStream << outputSS[2].str() << std::endl;
-
-    oStream << outputSS[3].str() << std::endl;
-    oStream << outputSS[4].str() << std::endl;
-    oStream << outputSS[5].str() << std::endl;
-
-    oStream << outputSS[6].str() << std::endl;
-    oStream << outputSS[7].str() << std::endl;     
-    oStream << outputSS[8].str() << std::endl;     
-                 
+    for (size_t i = 0; i < c_NumberOfCharBlocks; i++)
+    {
+        oStream << outputSS[i].str() << std::endl;
+    }         
 
     iStream.close();
     oStream.close();
