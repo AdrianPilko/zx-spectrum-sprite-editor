@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdlib>
 #include <vector>
+#include <sstream>
 
 // code to generate a Sinclair zx spectrum sprite suitable for my own programs -
 // in other words the ordering in memory works for me, that is all the bytes of the
@@ -40,8 +41,7 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
        return EXIT_FAILURE;
     }
 
-    oStream << "spriteData" << std::endl;
-    oStream << "   DB ";   
+    oStream << "spriteData:" << std::endl;
     std::string line;
     std::vector<std::string> fileAsStrVec;
     int32_t lastLineLen = 0;
@@ -49,8 +49,7 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
     while (std::getline(iStream, line)) 
     {
         currentLineLen = line.size();
-        // check all lines are the same length and have to be even number
-        // to maintain the 2x2 block valid size
+        
         if ((currentLineLen != lastLineLen && lastLineLen != 0) || (currentLineLen % 2 != 0))
         {
             std::cout << "ERROR: Lines not all even length" << std::endl;
@@ -67,59 +66,111 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
     }
 
     std::cout << "Number of rows == " << fileAsStrVec.size() << " number of columns==" << currentLineLen << std::endl;
-    std::cout << "This becomes a graphic of " << fileAsStrVec.size() / 2 << "x" << currentLineLen/2 << " character blocks"<< std::endl;
     
+    std::vector < std::vector <char > > twoDimGrid;
 
-    // need to check each 2x2 block for the pixel type, the -1 is to go to penulimate row in outer loop
-    // as the nested loop will handle this
-    
-    for (auto rowOuter = 0; rowOuter < fileAsStrVec.size() - 1; rowOuter+=2)
+    twoDimGrid.resize(24, std::vector<char>(24)); 
+
+    std::ostringstream buffer;
+    std::vector<std::ostringstream> outputSS;
+    outputSS.resize(9);
+    outputSS[0].str("");
+    outputSS[1].str("");
+    outputSS[2].str("");
+    outputSS[3].str("");
+    outputSS[4].str("");
+    outputSS[5].str("");
+    outputSS[6].str("");
+    outputSS[7].str("");
+    outputSS[8].str("");
+    int32_t third = 0;
+
+    for (auto rowOuter = 0; rowOuter < fileAsStrVec.size(); rowOuter++)
     {   
-        for (auto columnOuter = 0; columnOuter < fileAsStrVec[rowOuter].size() - 1; columnOuter+=2)
-        {
-            int32_t linearIndex = 0;
-            std::string linearVersion = "    ";
-            for (auto row = 0; row < 2; row++)
+        for (auto columnOuter = 0; columnOuter < fileAsStrVec[rowOuter].size(); columnOuter++)
+        {  
+            twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
+            std::cout << twoDimGrid[rowOuter][columnOuter] << " " ;
+            
+            //if (twoDimGrid[rowOuter][columnOuter] == '1')
+            if (twoDimGrid[rowOuter][columnOuter] == '1')
             {
-                for (auto col = 0; col < 2; col++)
+                buffer << "1";
+            }
+            else
+            {
+                buffer << "0";
+            }
+
+            if (third == 0)
+            {
+                if (columnOuter == 7)
                 {
-                    linearVersion[linearIndex++] = fileAsStrVec[row+rowOuter][col+columnOuter];
+                    outputSS[0] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                }
+                if (columnOuter == 15)
+                {
+                    outputSS[1] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                }
+                if (columnOuter == 23)
+                {
+                    outputSS[2] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                    third++;
+                }
+            } else if (third == 1)
+            {
+                if (columnOuter == 7)
+                {
+                    outputSS[3] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                }
+                if (columnOuter == 15)
+                {
+                    outputSS[4] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                }
+                if (columnOuter == 23)
+                {
+                    outputSS[5] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                    third++;
+                }
+            } else if (third == 2)
+            {   
+                if (columnOuter == 7)
+                {
+                    outputSS[6] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                }
+                if (columnOuter == 15)
+                {
+                    outputSS[7] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                }
+                if (columnOuter == 23)
+                {
+                    outputSS[8] << "defb %" << buffer.str() << std::endl;
+                    buffer.str("");
+                    third = 0;
                 }
             }
-            bool found = false;
-
-            for (size_t fIndex = 0; fIndex < patterns.size(); fIndex++)
-            {
-                if (patterns[fIndex].find(linearVersion) != std::string::npos)
-                {
-                    oStream << patternHexCodes.at(fIndex);
-
-                    if (columnOuter < fileAsStrVec[rowOuter].size() - 2)
-                    {
-                        oStream << ",";
-                    }
-                    found = true; 
-                } 
-            }
-            if (found == false)
-            {
-                std::cerr << "unknown character combination at row" << rowOuter << ", col " << columnOuter << 
-                    " inserting blank to maintain row column in output!!" << std::endl;
-                    oStream << patternHexCodes.at(0);
-
-                if (columnOuter < fileAsStrVec[rowOuter].size() - 2)
-                {
-                    oStream << ",";
-                }
-            }                  
         }
-
-        oStream <<std::endl;
-        if (rowOuter < fileAsStrVec.size() - 2)
-        {
-            oStream << "   DB ";
-        }
+        std::cout << std::endl;
     }
+  
+    oStream << outputSS[0].str() << std::endl;
+    oStream << outputSS[1].str() << std::endl;
+    oStream << outputSS[2].str() << std::endl;
+    oStream << outputSS[3].str() << std::endl;
+    oStream << outputSS[4].str() << std::endl;
+    oStream << outputSS[5].str() << std::endl;
+    oStream << outputSS[6].str() << std::endl;
+    oStream << outputSS[7].str() << std::endl;     
+    oStream << outputSS[8].str() << std::endl;     
+                 
 
     iStream.close();
     oStream.close();
@@ -133,7 +184,7 @@ int main(int argc, char * argv[])
     std::string inFile("NOT_SET");
     std::string outFile("NOT_SET");
 
-    std::cout << "Text based ZX81 Sprite Editor by Adrian Pilkington(2025)" << std::endl;
+    std::cout << "Text based ZX Spectrum Sprite Editor by Adrian Pilkington(2026)" << std::endl;
     if (argc == 3)
     {
         inFile = argv[1];
