@@ -90,7 +90,7 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
             twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
             std::cout << twoDimGrid[rowOuter][columnOuter] << " " ;
             
-            if (twoDimGrid[rowOuter][columnOuter] == '1')
+            if (twoDimGrid[rowOuter][columnOuter] == '*')
             {
                 buffer << "1";
             }
