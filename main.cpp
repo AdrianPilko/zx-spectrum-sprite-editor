@@ -28,9 +28,14 @@
 //...
 //...
 
+// future version will have variable width and height, as well as other options
+
 // the input is simply pixel on and pixel off being 0 = off 1 = on
                                             
-int32_t parseInput(const std::string & inFileName, const std::string & outFileName)
+int32_t parseInput(const std::string & inFileName, 
+                        const std::string & outFileName, 
+                        const int shiftBy,
+                        const bool mirrorImage)
 {
     const int32_t c_NumberOfCharBlocks{9};
 
@@ -71,7 +76,14 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
     
     std::vector < std::vector <char > > twoDimGrid;
 
-    twoDimGrid.resize(24, std::vector<char>(24)); 
+    twoDimGrid.resize(24, std::vector<char>(24));
+    for (int row = 0; row < 24; row++)
+    {
+        for (int col = 0; col < 24; col++)
+        {
+            twoDimGrid[row][col] = '-';
+        }
+    } 
 
     std::ostringstream buffer;
     std::vector<std::ostringstream> outputSS;
@@ -87,8 +99,25 @@ int32_t parseInput(const std::string & inFileName, const std::string & outFileNa
     {   
         for (auto columnOuter = 0; columnOuter < fileAsStrVec[rowOuter].size(); columnOuter++)
         {  
-            twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
-            std::cout << twoDimGrid[rowOuter][columnOuter] << " " ;
+            if (shiftBy != 0)
+            {
+                if (columnOuter+shiftBy > 0 && columnOuter+shiftBy<fileAsStrVec[rowOuter].size())
+                {
+                    twoDimGrid[rowOuter][columnOuter+shiftBy] = fileAsStrVec[rowOuter][columnOuter];
+                    std::cout << twoDimGrid[rowOuter][columnOuter+shiftBy] << " " ;
+                }
+                else
+                {
+                    twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
+                    std::cout << twoDimGrid[rowOuter][columnOuter] << " " ;
+                    std::cout << "  " ;
+                }
+            }
+            else
+            {
+                twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
+                std::cout << twoDimGrid[rowOuter][columnOuter] << " " ;                
+            }
             
             if (twoDimGrid[rowOuter][columnOuter] == '*')
             {
@@ -177,21 +206,26 @@ int main(int argc, char * argv[])
     int32_t retVal = EXIT_SUCCESS;
     std::string inFile("NOT_SET");
     std::string outFile("NOT_SET");
+    int shiftBy = 0;
+    int shiftDirection = 1;
+    bool mirror = false;
 
     std::cout << "Text based ZX Spectrum Sprite Editor by Adrian Pilkington(2026)" << std::endl;
-    if (argc == 3)
+    if (argc == 5)
     {
         inFile = argv[1];
         outFile= argv[2];
+        shiftBy = atoi(argv[3]);
+        mirror = atoi(argv[4]) == 1 ? true : false;
         std::cout << "Using input file=" << inFile << " outputting to " << outFile << std::endl;
-        if (parseInput(inFile,outFile) != EXIT_SUCCESS)
+        if (parseInput(inFile,outFile, shiftBy, mirror) != EXIT_SUCCESS)
         {
             std::cout << "Fault found in input file" << std::endl;
         }
     }
     else
     {
-        std::cout << "useage: " << argv[0] << " <input file> <output file>" << std::endl;
+        std::cout << "useage: " << argv[0] << " <input file> <output file> <shift by>  <mirror>" << std::endl;
         retVal = EXIT_FAILURE;
     }
     return retVal;
