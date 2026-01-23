@@ -35,7 +35,9 @@
 int32_t parseInput(const std::string & inFileName, 
                         const std::string & outFileName, 
                         const int shiftBy,
-                        const bool mirrorImage)
+                        const bool mirrorImage,
+                        const int VerticalDimension=24,
+                        const int HorizontalDimension=24)
 {
     const int32_t c_NumberOfCharBlocks{9};
 
@@ -76,10 +78,10 @@ int32_t parseInput(const std::string & inFileName,
     
     std::vector < std::vector <char > > twoDimGrid;
 
-    twoDimGrid.resize(24, std::vector<char>(24));
-    for (int row = 0; row < 24; row++)
+    twoDimGrid.resize(HorizontalDimension, std::vector<char>(VerticalDimension));
+    for (int row = 0; row < VerticalDimension; row++)
     {
-        for (int col = 0; col < 24; col++)
+        for (int col = 0; col < HorizontalDimension; col++)
         {
             twoDimGrid[row][col] = '-';
         }
@@ -209,24 +211,38 @@ int main(int argc, char * argv[])
     int shiftBy = 0;
     int shiftDirection = 1;
     bool mirror = false;
+    int VerticalDimension = 24;
+    int HorizontalDimension = 24;
+    bool argsOK = false;
 
     std::cout << "Text based ZX Spectrum Sprite Editor by Adrian Pilkington(2026)" << std::endl;
-    if (argc == 5)
+    if (argc >= 5)
     {
         inFile = argv[1];
         outFile= argv[2];
         shiftBy = atoi(argv[3]);
         mirror = atoi(argv[4]) == 1 ? true : false;
+        argsOK = true;
+    } 
+    else
+    {
+        std::cout << "useage: " << argv[0] << " <input file> <output file> <shift by>  <mirror> [(optional)<rows><cols>])" << std::endl;
+        retVal = EXIT_FAILURE;
+        argsOK = false;
+    }
+    if (argc == 7) // optional dimensions
+    {
+        VerticalDimension = atoi(argv[5]);
+        HorizontalDimension = atoi(argv[6]);
+        argsOK = true;
+    }
+    if (argsOK)
+    {
         std::cout << "Using input file=" << inFile << " outputting to " << outFile << std::endl;
-        if (parseInput(inFile,outFile, shiftBy, mirror) != EXIT_SUCCESS)
+        if (parseInput(inFile,outFile, shiftBy, mirror,VerticalDimension,HorizontalDimension) != EXIT_SUCCESS)
         {
             std::cout << "Fault found in input file" << std::endl;
         }
-    }
-    else
-    {
-        std::cout << "useage: " << argv[0] << " <input file> <output file> <shift by>  <mirror>" << std::endl;
-        retVal = EXIT_FAILURE;
     }
     return retVal;
 }
