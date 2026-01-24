@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 // code to generate a Sinclair zx spectrum sprite suitable for my own programs -
 // in other words the ordering in memory works for me, that is all the bytes of the
@@ -31,7 +32,29 @@
 // future version will have variable width and height, as well as other options
 
 // the input is simply pixel on and pixel off being 0 = off 1 = on
-                                            
+void rotateInnerDimension(std::vector<std::vector<char>>& matrix, int k) {
+    for (auto& inner_vec : matrix) {
+        if (inner_vec.empty()) continue;
+        
+        // Ensure k is within the range of the current row size
+        int actual_shift = k % inner_vec.size();
+        std::cout << actual_shift << std::endl << "before:" <<std::endl;
+        for (auto& inner : inner_vec)
+        {
+            std::cout << inner;
+        }
+        // std::rotate with reverse iterators performs a right rotation
+        std::rotate(inner_vec.rbegin(), inner_vec.rbegin() + actual_shift, inner_vec.rend());
+
+        std::cout << " after:" <<std::endl;
+        for (auto& inner : inner_vec)
+        {
+            std::cout << inner;
+        }
+        std::cout << std::endl;
+    }
+}
+
 int32_t parseInput(const std::string & inFileName, 
                         const std::string & outFileName, 
                         const int shiftBy,
@@ -78,12 +101,12 @@ int32_t parseInput(const std::string & inFileName,
     
     std::vector < std::vector <char > > twoDimGrid;
 
-    twoDimGrid.resize(HorizontalDimension, std::vector<char>(VerticalDimension));
+    twoDimGrid.resize(VerticalDimension, std::vector<char>(HorizontalDimension));
     for (int row = 0; row < VerticalDimension; row++)
     {
         for (int col = 0; col < HorizontalDimension; col++)
         {
-            twoDimGrid[row][col] = '-';
+            twoDimGrid[row][col] = fileAsStrVec[row][col];// (char)std::to_string(col % 8).c_str()[0];
         }
     } 
 
@@ -97,37 +120,38 @@ int32_t parseInput(const std::string & inFileName,
 
     int32_t third = 0;
 
+    if (shiftBy != 0)
+    {
+        std::cout << "rotating sprite by " << shiftBy << std::endl;
+        rotateInnerDimension(twoDimGrid, shiftBy);
+    }
+    else
+    {
+        for (auto rowOuter = 0; rowOuter < fileAsStrVec.size(); rowOuter++)
+        {   
+            for (auto columnOuter = 0; columnOuter < fileAsStrVec[rowOuter].size(); columnOuter++)
+            {  
+                twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
+            }
+        }
+    }
     for (auto rowOuter = 0; rowOuter < fileAsStrVec.size(); rowOuter++)
     {   
         for (auto columnOuter = 0; columnOuter < fileAsStrVec[rowOuter].size(); columnOuter++)
-        {  
-            if (shiftBy != 0)
-            {
-                if (columnOuter+shiftBy > 0 && columnOuter+shiftBy<fileAsStrVec[rowOuter].size())
-                {
-                    twoDimGrid[rowOuter][columnOuter+shiftBy] = fileAsStrVec[rowOuter][columnOuter];
-                    std::cout << twoDimGrid[rowOuter][columnOuter+shiftBy] << " " ;
-                }
-                else
-                {
-                    twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
-                    std::cout << twoDimGrid[rowOuter][columnOuter] << " " ;
-                    std::cout << "  " ;
-                }
-            }
-            else
-            {
-                twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
-                std::cout << twoDimGrid[rowOuter][columnOuter] << " " ;                
-            }
-            
+        {              
             if (twoDimGrid[rowOuter][columnOuter] == '*')
             {
                 buffer << "1";
+                std::cout << "*" ;
             }
             else
             {
                 buffer << "0";
+                std::cout << " " ;
+            }
+            if (columnOuter == fileAsStrVec[rowOuter].size()-1)
+            {
+                std::cout << std::endl;
             }
 
             if (third == 0)
@@ -186,7 +210,6 @@ int32_t parseInput(const std::string & inFileName,
         if (rowOuter == 7) third++;
         if (rowOuter == 15) third++;
         if (rowOuter == 23) third++;
-        std::cout << std::endl;
     }
     // 0 1 2 
     // 3 4 5
@@ -199,12 +222,30 @@ int32_t parseInput(const std::string & inFileName,
 
     iStream.close();
     oStream.close();
-    std::cout << "----" << std::endl;
+    std::cout << "DONE" << std::endl;
     return EXIT_SUCCESS;
 }
 
 int main(int argc, char * argv[])
 {
+
+    #if 0
+    // test rotate
+    std::vector< std::vector<char> > vec;
+    for (int row = 0; row < 8; row++)
+    {
+        std::vector<char> temp;
+        for (int col = 0; col < 24; col++)
+        {
+            char c = (char)std::to_string(col % 8).c_str()[0];
+            temp.push_back(c);
+        }
+        vec.push_back(temp);
+    }
+    rotateInnerDimension(vec, 1);
+    return 0;
+    #endif
+
     int32_t retVal = EXIT_SUCCESS;
     std::string inFile("NOT_SET");
     std::string outFile("NOT_SET");
