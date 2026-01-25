@@ -38,20 +38,8 @@ void rotateInnerDimension(std::vector<std::vector<char>>& matrix, int k) {
         
         // Ensure k is within the range of the current row size
         int actual_shift = k % inner_vec.size();
-        std::cout << actual_shift << std::endl << "before:" <<std::endl;
-        for (auto& inner : inner_vec)
-        {
-            std::cout << inner;
-        }
         // std::rotate with reverse iterators performs a right rotation
         std::rotate(inner_vec.rbegin(), inner_vec.rbegin() + actual_shift, inner_vec.rend());
-
-        std::cout << " after:" <<std::endl;
-        for (auto& inner : inner_vec)
-        {
-            std::cout << inner;
-        }
-        std::cout << std::endl;
     }
 }
 
@@ -76,29 +64,34 @@ int32_t parseInput(const std::string & inFileName,
     oStream << "spriteData:" << std::endl;
     std::string line;
     std::vector<std::string> fileAsStrVec;
-    int32_t lastLineLen = 0;
+    
+    for (int i = 0; i < VerticalDimension; i++)
+    {
+        fileAsStrVec.push_back(std::string(HorizontalDimension, '-'));
+    }
+
     int32_t currentLineLen = 0;
+    size_t index = 0;
+
     while (std::getline(iStream, line)) 
     {
         currentLineLen = line.size();
         
-        if ((currentLineLen != lastLineLen && lastLineLen != 0) || (currentLineLen % 2 != 0))
+        if (currentLineLen >= HorizontalDimension)
         {
-            std::cout << "ERROR: Lines not all even length" << std::endl;
+            std::cout << "ERROR: Lines wrong length " << currentLineLen << std::endl;
             return EXIT_FAILURE;
         }
-        lastLineLen = currentLineLen;
-        fileAsStrVec.push_back(line);
-    }
-    // the number of lines also has to be even
-    if (fileAsStrVec.size() % 2 != 0)
-    {
-        std::cout << "ERROR: number of lines is not even" << fileAsStrVec.size() << std::endl;
-        return EXIT_FAILURE;
+        line.resize(HorizontalDimension,' ');
+        fileAsStrVec.at(index++) = line;
+        if (index > VerticalDimension)
+        {
+            std::cout << "ERROR: number of lines exceeds expected " << fileAsStrVec.size() << std::endl;
+            return EXIT_FAILURE;
+        }
     }
 
     std::cout << "Number of rows == " << fileAsStrVec.size() << " number of columns==" << currentLineLen << std::endl;
-    
     std::vector < std::vector <char > > twoDimGrid;
 
     twoDimGrid.resize(VerticalDimension, std::vector<char>(HorizontalDimension));
@@ -106,7 +99,14 @@ int32_t parseInput(const std::string & inFileName,
     {
         for (int col = 0; col < HorizontalDimension; col++)
         {
-            twoDimGrid[row][col] = fileAsStrVec[row][col];// (char)std::to_string(col % 8).c_str()[0];
+            if (fileAsStrVec[row][col] == ' ')
+            {
+               twoDimGrid[row][col] = '-';
+            }
+            else
+            {
+               twoDimGrid[row][col] =  '*';
+            }
         }
     } 
 
@@ -125,29 +125,20 @@ int32_t parseInput(const std::string & inFileName,
         std::cout << "rotating sprite by " << shiftBy << std::endl;
         rotateInnerDimension(twoDimGrid, shiftBy);
     }
-    else
-    {
-        for (auto rowOuter = 0; rowOuter < fileAsStrVec.size(); rowOuter++)
-        {   
-            for (auto columnOuter = 0; columnOuter < fileAsStrVec[rowOuter].size(); columnOuter++)
-            {  
-                twoDimGrid[rowOuter][columnOuter] = fileAsStrVec[rowOuter][columnOuter];
-            }
-        }
-    }
+
     for (auto rowOuter = 0; rowOuter < fileAsStrVec.size(); rowOuter++)
     {   
         for (auto columnOuter = 0; columnOuter < fileAsStrVec[rowOuter].size(); columnOuter++)
         {              
             if (twoDimGrid[rowOuter][columnOuter] == '*')
             {
-                buffer << "1";
-                std::cout << "*" ;
+                buffer << '1';
+                std::cout << '*' ;
             }
             else
             {
-                buffer << "0";
-                std::cout << " " ;
+                buffer << '0';
+                std::cout << '-';
             }
             if (columnOuter == fileAsStrVec[rowOuter].size()-1)
             {
@@ -228,8 +219,9 @@ int32_t parseInput(const std::string & inFileName,
 
 int main(int argc, char * argv[])
 {
+    //#define TEST_ROTATE
 
-    #if 0
+    #ifdef TEST_ROTATE
     // test rotate
     std::vector< std::vector<char> > vec;
     for (int row = 0; row < 8; row++)
